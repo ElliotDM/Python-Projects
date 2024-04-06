@@ -2,12 +2,13 @@ import time
 import datetime
 import threading
 from tkinter import *
+from tkinter import messagebox
 
+NUM_ITERATIONS = 4
 countdown = "25:00"
 work = True
 rest = False
 iterations = 0
-
 
 def change_color(color: str):
     frame.config(bg=color)
@@ -29,21 +30,19 @@ def pomodoro():
 
     start.config(state=DISABLED)
 
-    # TODO: fix pomodoro iterations
-    # iterations = 4
-    if iterations >= 2:
-        total_seconds = 0.5 * 60
+    if iterations >= NUM_ITERATIONS:
+        total_seconds = 15 * 60
         work = True
         iterations = 0
     elif work:
-        total_seconds = 0.25 * 60
+        total_seconds = 25 * 60
         work = False
         rest = True
-    elif rest and iterations < 2:
-        total_seconds = 0.25 * 60
+        iterations += 1
+    elif rest and iterations < NUM_ITERATIONS:
+        total_seconds = 5 * 60
         work = True
         rest = False
-        iterations += 1
 
     while total_seconds > 0:
         timer = datetime.timedelta(seconds = total_seconds)
@@ -51,15 +50,18 @@ def pomodoro():
         time.sleep(1)
         total_seconds -= 1
     
-    if iterations >= 2:
+    if iterations >= NUM_ITERATIONS:
         countdown = "15:00"
         change_color("#00A2E8")
+        messagebox.showinfo(message="Take a long rest", title="Pomodoro")
     elif work:
         countdown = "25:00"
         change_color("#D61616") 
-    elif rest:
+        messagebox.showinfo(message="Continue working", title="Pomodoro")
+    elif rest and iterations < NUM_ITERATIONS:
         countdown = "05:00"
-        change_color("#16BE16") 
+        change_color("#16BE16")
+        messagebox.showinfo(message="Take a rest", title="Pomodoro")
 
     start.config(state=NORMAL)
 
@@ -80,8 +82,7 @@ frame = Frame(root,
               height=180)
 frame.config() 
 
-# TODO: fix label size
-label = Label(root, text=countdown)
+label = Label(frame, text=countdown)
 label.config(fg="#FFFFFF",
              bg="#D61616",
              font=("Segoe UI Black",50))
@@ -91,9 +92,11 @@ start = Button(root,
                font=("Segoe UI",16),
                command=start_pomodoro)
 
-frame.grid(row=0,column=0, columnspan=4, padx=10, pady=10)
-label.grid(row=0,column=0, columnspan=4, padx=10, pady=10)
-start.grid(row=1,column=1, columnspan=2, padx=10, pady=10)
+# TODO: add pause button
+
+frame.pack(expand=True, fill=BOTH, padx=20, pady=10)
+label.pack(expand=True, fill=BOTH)
+start.pack(padx=20, pady=10)
 
 root.mainloop()
 
