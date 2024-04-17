@@ -1,58 +1,75 @@
-from tkinter import *
+import tkinter as tk
 
-task_list = []
 
-root = Tk()
-root.title("ToDo")
-root.geometry("300x500")
-root.resizable(1,0)
+class ToDo(tk.Tk):
+    def __init__(self) -> None:
+        super().__init__()
 
-task_var = StringVar()
+        self.title("ToDo")
+        self.geometry("300x500")
+        self.resizable(1,0)
 
-label = Label(root, 
-              text="ToDo", 
-              font=("Segoe UI",18))
+        self.task_var = tk.StringVar()
+        self.dict = {}
 
-frame = Frame(root, 
-              bg="#30C9E4")
+        self.label = tk.Label(self,
+                              text="ToDo",
+                              font=("Segoe UI",18))
+        
+        self.frame = tk.Frame(self,
+                              bg="#30C9E4")
+        
+        self.entry = tk.Entry(self,
+                              textvariable=self.task_var,
+                              font=("Segoe UI",14))
+        
+        self.add_btn = tk.Button(self,
+                                 text="Add task",
+                                 font=("Segoe UI",14),
+                                 command=self.add_task)
+        
+        self.del_btn = tk.Button(self,
+                                 text="Delete task",
+                                 font=("Segoe UI",14),
+                                 command=self.delete_task)
+        
+        self.label.pack()
+        self.frame.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+        self.entry.pack(fill=tk.BOTH, padx=10, pady=10)
+        self.add_btn.pack(expand=True, fill=tk.BOTH, side=tk.LEFT, padx=10, pady=10)
+        self.del_btn.pack(expand=True, fill=tk.BOTH, side=tk.LEFT, padx=10, pady=10)
 
-entry = Entry(root,
-              textvariable=task_var,
-              font=("Segoe UI",14))
+    def add_task(self):
+        if self.task_var.get() in self.dict:
+            self.task_var.set("")
+            return
 
-def submit_task():
-    task_frame = Frame(frame,
-                       bg="#FFFFFF")
+        self.task_frame = tk.Frame(self.frame,
+                                   bg="#FFFFFF")
+        
+        self.task_label = tk.Label(self.task_frame,
+                                   text=self.task_var.get(), 
+                                   bg="#FFFFFF",
+                                   font=("Segoe UI",18))
+        
+        self.dict[self.task_var.get()] = self.task_frame
+        self.task_var.set("")
     
-    task_label = Label(task_frame,
-                       text=task_var.get(), 
-                       bg="#FFFFFF",
-                       font=("Segoe UI",18))
-    
-    del_btn = Button(task_frame,
-                     text="✓",
-                     command=delete_task)
-    
-    task_frame.pack(fill=BOTH, padx=10, pady=10)
-    task_label.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
-    del_btn.pack(side=LEFT, padx=10, pady=10)
+        self.task_frame.pack(fill=tk.BOTH, padx=10, pady=10)
+        self.task_label.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=10, pady=10)
+        self.del_btn.pack(side=tk.LEFT, padx=10, pady=10)
 
-    task_list.append(task_frame)
-    task_var.set("")
+    def delete_task(self):
+        if self.task_var.get() not in self.dict:
+            self.task_var.set("")
+            return
+        
+        this_frame = self.dict.pop(self.task_var.get())
+        this_frame.destroy()
+        self.task_var.set("")
 
 
-# TODO: fix button bug
-def delete_task():
-    task_list[0].destroy()
-
-sub_btn = Button(root,
-                text="+",
-                font=("Segoe UI",14),
-                command=submit_task)
-
-label.pack()
-frame.pack(expand=True, fill=BOTH, padx=10, pady=10)
-entry.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
-sub_btn.pack(side=LEFT, padx=10, pady=10)
-
-root.mainloop()
+if __name__ == '__main__':
+    app = ToDo()
+    app.mainloop()
+  
